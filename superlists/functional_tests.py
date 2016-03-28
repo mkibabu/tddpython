@@ -3,7 +3,7 @@ import unittest
 
 class NewVisitorTest(unittest.TestCase):
     """
-    Tests are organized intomclasses, which inherit from unittest.TestCase
+    Tests are organized into classes, which inherit from unittest.TestCase
     """
 
     """
@@ -38,7 +38,7 @@ class NewVisitorTest(unittest.TestCase):
         # There is still a test box prompting to add another item. Add 'Play with the
         # cat'.
         
-        # Page updates again, and now bo items are on the list.
+        # Page updates again, and now both items are on the list.
         
         # Site generates a unique url for the user's list.
         
@@ -46,8 +46,8 @@ class NewVisitorTest(unittest.TestCase):
 
 """
 The 'if __name__ == '__main__' clause is used to determine whether the script has
-been called from the command lne, rathert han just imported by another script.
-Here, we use it to suppress a potential superfluous ResourceWArning error message.
+been called from the command lne, rather than just imported by another script.
+Here, we use it to suppress a potential superfluous ResourceWarning error message.
 """
 if __name__ == '__main__':
     unittest.main(warnings='ignore')
