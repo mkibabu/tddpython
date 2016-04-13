@@ -26,18 +26,30 @@ class NewVisitorTest(unittest.TestCase):
         
         # Verify the page title mentions 'To-Do'
         self.assertIn('To-Do', self.browser.title)
-        self.fail('Finish the test!')
-        
-        # See prompt to enter a to-do item
-        
+        header_text = self.browser.find_element_by_tag_name('h1').text
+        self.assertIn('To-Do', header_text)
+
+        # Find prompt to enter a to-do item
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        self.assertEqual(
+                inputbox.get_attribute('placeholder'),
+                'Enter a to-do item'
+        )
+
         # Enter a to-do item: 'Eat more kale'
-        
+        inputbox.send_keys('Eat more kale')
         # Hit enter, and page updates, and lists
         # '1. Eat more kale' as an item on the to-do list
-        
+        inputbox.send_keys('Keys.ENTER')
+        table = self.browser.find_element_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertTrue(
+                any(row.text == '1. Eat more kale' for row in rows)
+        )
         # There is still a test box prompting to add another item. Add 'Play with the
         # cat'.
-        
+        self.fail('Finish the test!')
+
         # Page updates again, and now both items are on the list.
         
         # Site generates a unique url for the user's list.
