@@ -1,4 +1,5 @@
 from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
 import unittest
 
 class NewVisitorTest(unittest.TestCase):
@@ -40,27 +41,31 @@ class NewVisitorTest(unittest.TestCase):
         inputbox.send_keys('Eat more kale')
         # Hit enter, and page updates, and lists
         # '1. Eat more kale' as an item on the to-do list
-        inputbox.send_keys('Keys.ENTER')
+        inputbox.send_keys(Keys.ENTER)
+        
         table = self.browser.find_element_by_id('id_list_table')
         rows = table.find_elements_by_tag_name('tr')
-        self.assertTrue(
-                any(row.text == '1. Eat more kale' for row in rows),
-                "New to-do item did not appear in table"
-        )
+        self.assertIn('1. Eat more kale', [row.text for row in rows])
         # There is still a test box prompting to add another item. Add 'Play with the
         # cat'.
+        # since pae refreshed, Selenium has lost reference to elements
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('2. Play with the cat')
+        inputbox.send_keys(Keys.ENTER)
         self.fail('Finish the test!')
 
         # Page updates again, and now both items are on the list.
-        
+        table = self,browser.find_elemt_by_id('id_list_table')
+        rows = table.find_elements_by_tag_name('tr')
+        self.assertIn('1. Eat more kale', [row.text for row in rows])
+        self.assertIn('2. Play with the cat', [row.text for row in rows])
         # Site generates a unique url for the user's list.
         
         # User visits that url; list is still there.
 
 """
 The 'if __name__ == '__main__' clause is used to determine whether the script has
-been called from the command lne, rather than just imported by another script.
-Here, we use it to suppress a potential superfluous ResourceWarning error message.
+been called from the command line, rather than just imported by another script.
 """
 if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+    unittest.main()

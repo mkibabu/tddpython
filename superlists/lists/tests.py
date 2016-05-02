@@ -19,10 +19,26 @@ class HomePageTest(TestCase):
         # Django's resolve('path') function is used to resolve urls. We'll use it
         # to check that '/' resolves to a function called home_page
         found = resolve('/')
+
         self.assertEqual(found.func, home_page)
 
     def test_home_page_returns_correct_html(self):
         request = HttpRequest()
         response = home_page(request)
+
         expected_html = render_to_string('home.html')
+
+        self.assertEqual(response.content.decode(), expected_html)
+
+    def test_home_page_can_save_a_POST_request(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'Test list entry'
+
+        response = home_page(request)
+
+        self.assertIn('Test list entry', response.content.decode())
+        expected_html = render_to_string ('home.html',
+                { 'new_item_text': 'Test list entry' }
+        )
         self.assertEqual(response.content.decode(), expected_html)
