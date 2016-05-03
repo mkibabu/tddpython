@@ -38,12 +38,37 @@ class HomePageTest(TestCase):
 
         response = home_page(request)
 
-        self.assertIn('Test list entry', response.content.decode())
-        expected_html = render_to_string ('home.html',
-                { 'new_item_text': 'Test list entry' }
-        )
-        self.assertEqual(response.content.decode(), expected_html)
-       
+        # check that the list entry has been saved to the db.
+        # objects.count() is shorthand for objects.all().count()
+        self.assertEqual(Item.objects.count(), 1)
+        new_item = Item.objects.first()
+        self.assertEqual(new_item.text, 'Test list entry')
+
+    def test_home_page_redirects_after_post(self):
+        request = HttpRequest()
+        request.method = 'POST'
+        request.POST['item_text'] = 'Test list entry'
+
+        response = home_page(request)
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response['location'], '/')
+
+    def test_home_page_only_saves_items_when_necessary(self):
+        request =  HttpRequest()
+        home_page(request)
+        self.assertEqual(Item.objects.count(), 0)
+
+    def test_home_page_displays_all_items_in_list(self):
+        Item.objects.create(text='First item in list')
+        Item.objects.create(text='Second item in list')
+
+        request = HttpRequest()
+        response = home_page(request)
+
+        self.assertIn('First item in list', response.content.decode())
+        self.assertIn('Second item in list', response.content.decode())
+
 class ItemModelTest(TestCase):
 
     def test_saving_and_retrieving_items(self):

@@ -1,9 +1,14 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
+from lists.models import Item
 
 # Create your views here.
 def home_page(request):
-# render the page, and use the POSTed variable or a blank string
-    return render(request, 'home.html', {
-        'new_item_text': request.POST.get('item_text', '') 
-    })
+    # create a new item, and save its text to the list item or a blank string
+    if request.method == 'POST':
+        # objects.create(attribute=value) is a shortcut to creating and saving a 
+        # model instance  without having to call the model constructor or call .save()
+        Item.objects.create(text=request.POST['item_text'])
+        return redirect('/')
+    items = Item.objects.all()
+    return render(request, 'home.html', {'items': items})
 
