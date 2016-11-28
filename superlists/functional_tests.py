@@ -1,5 +1,6 @@
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import unittest
 
 class NewVisitorTest(unittest.TestCase):
@@ -12,7 +13,8 @@ class NewVisitorTest(unittest.TestCase):
     after each test.
     """
     def setUp(self):
-        self.browser = webdriver.Firefox()
+        self.browser = webdriver.Firefox(firefox_binary=FirefoxBinary(
+            firefox_path="/Users/mmuraya/.local/bin/Firefox.app/Contents/MacOS/firefox"))
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
