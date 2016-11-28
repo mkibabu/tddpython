@@ -73,4 +73,4 @@ The 'if __name__ == '__main__' clause is used to determine whether the script ha
 been called from the command line, rather than just imported by another script.
 """
 if __name__ == '__main__':
-    unittest.main()
+    unittest.main(warnings='ignore')
