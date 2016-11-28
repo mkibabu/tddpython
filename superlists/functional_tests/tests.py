@@ -1,9 +1,11 @@
+from django.test import LiveServerTestCase
+
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import unittest
 
-class NewVisitorTest(unittest.TestCase):
+class NewVisitorTest(LiveServerTestCase):
     """
     Tests are organized into classes, which inherit from unittest.TestCase
     """
@@ -33,7 +35,7 @@ class NewVisitorTest(unittest.TestCase):
     """
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Go to the To-Do app's home page
-        self.browser.get('http://localhost:8000')
+        self.browser.get(self.live_server_url)
         
         # Verify the page title mentions 'To-Do'
         self.assertIn('To-Do', self.browser.title)
@@ -68,9 +70,4 @@ class NewVisitorTest(unittest.TestCase):
         # User visits that url; list is still there.
 
         self.fail('Finish the test!')
-"""
-The 'if __name__ == '__main__' clause is used to determine whether the script has
-been called from the command line, rather than just imported by another script.
-"""
-if __name__ == '__main__':
-    unittest.main(warnings='ignore')
+
