@@ -9,14 +9,16 @@ class NewVisitorTest(LiveServerTestCase):
     """
     Tests are organized into classes, which inherit from unittest.TestCase
     """
+    def createBrowser(self):
+        self.browser = webdriver.Firefox(firefox_binary=FirefoxBinary(
+            firefox_path="/Users/mmuraya/.local/bin/Firefox.app/Contents/MacOS/firefox"))
 
     """
     setUp and tearDown are restricted methods, used to initialize and clean up
     after each test.
     """
     def setUp(self):
-        self.browser = webdriver.Firefox(firefox_binary=FirefoxBinary(
-            firefox_path="/Users/mmuraya/.local/bin/Firefox.app/Contents/MacOS/firefox"))
+        self.createBrowser()
         self.browser.implicitly_wait(3)
 
     def tearDown(self):
@@ -54,6 +56,8 @@ class NewVisitorTest(LiveServerTestCase):
         # Hit enter, and page updates, and lists
         # '1. Eat more kale' as an item on the to-do list
         inputbox.send_keys(Keys.ENTER)
+        first_user_list_url = self.browser.current_url
+        self.assertRegex(first_user_list_url, '/lists/.+')
         self.check_for_row_in_list_table('1. Eat more kale')
         # There is still a test box prompting to add another item. Add 'Play with the
         # cat'.
@@ -65,9 +69,31 @@ class NewVisitorTest(LiveServerTestCase):
         # Page updates again, and now both items are on the list.
         self.check_for_row_in_list_table('1. Eat more kale')
         self.check_for_row_in_list_table('2. Play with the cat')
-        # Site generates a unique url for the user's list.
-        
-        # User visits that url; list is still there.
+
+        # New user comes along. Use a new browser session to ensure no session
+        # info leaks through
+        self.browser.quit()
+        self.createBrowser() 
+        # New user visits home page. Ensure the first user's list isn't visible
+        self.browser.get(self.live_server_url)
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Eat more kale', page_text)
+        self.assertNotIn('Play with the cat', page_text)
+
+        # new user starts a new list
+        inputbox = self.browser.find_element_by_id('id_new_item')
+        inputbox.send_keys('Buy milk')
+        inputbox.send_keys(Keys.ENTER)
+
+        # new user gets a new list url
+        second_user_list_url = self.browser.current_url
+        self.assertRegex(second_user_list_url, '/lists/.+')
+        self.assertNotEqual(first_user_list_url, second_user_list_url)
+
+        # confirm again that the first user's list is not visible
+        page_text = self.browser.find_element_by_tag_name('body').text
+        self.assertNotIn('Eat more kale', page_text)
+        self.assertNotIn('Play with the cat', page_text)
 
         self.fail('Finish the test!')
 
