@@ -18,6 +18,12 @@ can extract inividual records and/or call further functions, like .count().
 # as the primary key of the table. Once the model is created, we need to add it
 # to the database; do this by running manage.py makemigrations
 
+
+class List(models.Model):
+        pass
+
 class Item(models.Model):
-    # add a text column, with a default value
+    # add a text and list column, with a default value
     text = models.TextField(default='')
+    list = models.ForeignKey(List, default=None)
+
