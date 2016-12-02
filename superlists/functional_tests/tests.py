@@ -98,7 +98,9 @@ class NewVisitorTest(StaticLiveServerTestCase):
 
     def test_layout_and_styling(self):
         """Tests that the static files (here, CSS) are loading, by checking one
-        aspect of the layout
+        aspect of the layout. Testing design and layout should be avoided, since
+        those change, but one can (and should) have a small 'smoke test' such as
+        this one to make sure that static files are loaded.
         """
         self.browser.get(self.live_server_url)
         self.browser.set_window_size(1024, 768)
