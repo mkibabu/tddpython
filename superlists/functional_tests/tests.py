@@ -1,11 +1,11 @@
-from django.test import LiveServerTestCase
+from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
 import unittest
 
-class NewVisitorTest(LiveServerTestCase):
+class NewVisitorTest(StaticLiveServerTestCase):
     """
     Tests are organized into classes, which inherit from unittest.TestCase
     """
@@ -38,7 +38,7 @@ class NewVisitorTest(LiveServerTestCase):
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Go to the To-Do app's home page
         self.browser.get(self.live_server_url)
-        
+
         # Verify the page title mentions 'To-Do'
         self.assertIn('To-Do', self.browser.title)
         header_text = self.browser.find_element_by_tag_name('h1').text
@@ -73,7 +73,7 @@ class NewVisitorTest(LiveServerTestCase):
         # New user comes along. Use a new browser session to ensure no session
         # info leaks through
         self.browser.quit()
-        self.createBrowser() 
+        self.createBrowser()
         # New user visits home page. Ensure the first user's list isn't visible
         self.browser.get(self.live_server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
@@ -95,7 +95,7 @@ class NewVisitorTest(LiveServerTestCase):
         self.assertNotIn('Eat more kale', page_text)
         self.assertNotIn('Play with the cat', page_text)
 
-    
+
     def test_layout_and_styling(self):
         """Tests that the static files (here, CSS) are loading, by checking one
         aspect of the layout
@@ -104,12 +104,12 @@ class NewVisitorTest(LiveServerTestCase):
         self.browser.set_window_size(1024, 768)
 
         inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2, 
+        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2,
                               512,
                               delta=5)
 
         inputbox.send_keys('testing\n')
         inputbox = self.browser.find_element_by_id('id_new_item')
-        self.assertAlmostEqual(inputbox.loation['x'] + inputbox.size['width'] / 2,
+        self.assertAlmostEqual(inputbox.location['x'] + inputbox.size['width'] / 2,
                                512,
                                delta = 5)
