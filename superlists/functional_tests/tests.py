@@ -3,15 +3,37 @@ from django.contrib.staticfiles.testing import StaticLiveServerTestCase
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.firefox.firefox_binary import FirefoxBinary
+
 import unittest
+import sys
 
 class NewVisitorTest(StaticLiveServerTestCase):
     """
-    Tests are organized into classes, which inherit from unittest.TestCase
+    Tests are organized into classes, which inherit from unittest.TestCase or its
+    Django derivatives
     """
     def createBrowser(self):
         self.browser = webdriver.Firefox(firefox_binary=FirefoxBinary(
             firefox_path="/Users/mmuraya/.local/bin/Firefox.app/Contents/MacOS/firefox"))
+
+    @classmethod
+    def setUpClass(self):
+        """Dirty hack to adapt tests to run on staging. LiveServerTestCase assumes we
+        want to always use its test server. This hack makes it so that we can sometimes
+        change that to use a different urls
+        """
+        for arg in sys.argv:
+            if 'liveserver' in arg:
+                self.server_url = 'http://{}'.format(arg.split('=')[1])
+                return
+        # we inherit from LiveServerTestCase; here's where it sets up the tet server
+        super().setUpClass()
+        self.server_url = self.live_server_url
+
+    @classmethod
+    def tearDownClass(self):
+        if self.server_url == self.live_server_url:
+            super().tearDownClass()
 
     """
     setUp and tearDown are restricted methods, used to initialize and clean up
@@ -37,7 +59,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
     """
     def test_can_start_a_list_and_retrieve_it_later(self):
         # Go to the To-Do app's home page
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
 
         # Verify the page title mentions 'To-Do'
         self.assertIn('To-Do', self.browser.title)
@@ -75,7 +97,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         self.browser.quit()
         self.createBrowser()
         # New user visits home page. Ensure the first user's list isn't visible
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         page_text = self.browser.find_element_by_tag_name('body').text
         self.assertNotIn('Eat more kale', page_text)
         self.assertNotIn('Play with the cat', page_text)
@@ -102,7 +124,7 @@ class NewVisitorTest(StaticLiveServerTestCase):
         those change, but one can (and should) have a small 'smoke test' such as
         this one to make sure that static files are loaded.
         """
-        self.browser.get(self.live_server_url)
+        self.browser.get(self.server_url)
         self.browser.set_window_size(1024, 768)
 
         inputbox = self.browser.find_element_by_id('id_new_item')
